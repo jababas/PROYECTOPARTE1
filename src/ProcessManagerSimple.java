@@ -266,27 +266,36 @@ public class ProcessManagerSimple extends JFrame {
     }
 
     // ───────── TABLA ─────────
+    // ───────── TABLA ─────────
     class ModeloTabla extends AbstractTableModel {
 
         String[] cols = {
                 "Nombre", "Tamaño", "Llegada",
-                "Entrada", "Espera", "Salida", "Estado"
+                "Espera", "Salida", "Estado"
         };
 
-        public int getRowCount() { return historial.size(); }
-        public int getColumnCount() { return cols.length; }
-        public String getColumnName(int c) { return cols[c]; }
+        public int getRowCount() {
+            return historial.size();
+        }
+
+        public int getColumnCount() {
+            return cols.length;
+        }
+
+        public String getColumnName(int c) {
+            return cols[c];
+        }
 
         public Object getValueAt(int r, int c) {
             Proceso p = historial.get(r);
+
             return switch (c) {
                 case 0 -> p.nombre;
                 case 1 -> p.tamaño;
                 case 2 -> p.llegada;
-                case 3 -> p.entrada;
-                case 4 -> p.espera;
-                case 5 -> p.salida;
-                case 6 -> p.estado;
+                case 3 -> p.espera;
+                case 4 -> p.salida;
+                case 5 -> p.estado;
                 default -> "";
             };
         }
@@ -294,27 +303,39 @@ public class ProcessManagerSimple extends JFrame {
 
     // ───────── COLORES TABLA ─────────
     void aplicarColoresTabla() {
-        DefaultTableCellRenderer r = new DefaultTableCellRenderer() {
-            public Component getTableCellRendererComponent(
-                    JTable t, Object v, boolean sel,
-                    boolean foc, int row, int col) {
 
-                super.getTableCellRendererComponent(t, v, sel, foc, row, col);
-                String estado = (String) t.getValueAt(row, 6);
+        DefaultTableCellRenderer r =
+                new DefaultTableCellRenderer() {
 
-                if ("En memoria".equals(estado))
-                    setBackground(new Color(180, 255, 180));
-                else if ("En espera".equals(estado))
-                    setBackground(new Color(255, 230, 180));
-                else
-                    setBackground(new Color(220, 220, 220));
+                    public Component getTableCellRendererComponent(
+                            JTable t, Object v, boolean sel,
+                            boolean foc, int row, int col) {
 
-                if (sel) setBackground(Color.CYAN);
-                return this;
-            }
-        };
+                        super.getTableCellRendererComponent(
+                                t, v, sel, foc, row, col);
+
+                        // 👇 Ahora Estado está en la columna 5
+                        String estado =
+                                (String) t.getValueAt(row, 5);
+
+                        if ("En memoria".equals(estado))
+                            setBackground(new Color(180, 255, 180));
+                        else if ("En espera".equals(estado))
+                            setBackground(new Color(255, 230, 180));
+                        else
+                            setBackground(new Color(220, 220, 220));
+
+                        if (sel)
+                            setBackground(Color.CYAN);
+
+                        return this;
+                    }
+                };
+
         for (int i = 0; i < tabla.getColumnCount(); i++)
-            tabla.getColumnModel().getColumn(i).setCellRenderer(r);
+            tabla.getColumnModel()
+                    .getColumn(i)
+                    .setCellRenderer(r);
     }
 
     public static void main(String[] args) {
