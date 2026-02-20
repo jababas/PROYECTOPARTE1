@@ -5,6 +5,8 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
+import java.awt.Color;
+import java.util.Random;
 
 public class ProcessManagerSimple extends JFrame {
 
@@ -13,9 +15,10 @@ public class ProcessManagerSimple extends JFrame {
 
     // ───────── MODELOS ─────────
     static class Proceso {
+        Color color;
         String nombre;
         int tamaño;
-        String llegada, entrada = "-", salida = "-", espera = "-";
+        String llegada, salida = "-", espera = "-";
         LocalTime inicioEspera;
         String estado = "En memoria";
 
@@ -23,6 +26,13 @@ public class ProcessManagerSimple extends JFrame {
             nombre = n;
             tamaño = t;
             llegada = LocalTime.now().format(FMT);
+
+            Random r = new Random();
+            color = new Color(
+                    100 + r.nextInt(156),
+                    100 + r.nextInt(156),
+                    100 + r.nextInt(156)
+            );
         }
     }
 
@@ -139,7 +149,6 @@ public class ProcessManagerSimple extends JFrame {
                 }
 
                 b.tamaño = p.tamaño;
-                p.entrada = LocalTime.now().format(FMT);
                 p.estado = "En memoria";
 
                 if (p.inicioEspera != null) {
@@ -252,7 +261,7 @@ public class ProcessManagerSimple extends JFrame {
                     g.drawRect(40, y, 180, bh);
                     g.drawString("Libre (" + b.tamaño + ")", 45, y + bh / 2);
                 } else {
-                    g.setColor(Color.GREEN);
+                    g.setColor(b.proceso.color);
                     g.fillRect(40, y, 180, bh);
                     g.setColor(Color.BLACK);
                     g.drawRect(40, y, 180, bh);
@@ -266,12 +275,11 @@ public class ProcessManagerSimple extends JFrame {
     }
 
     // ───────── TABLA ─────────
-    // ───────── TABLA ─────────
     class ModeloTabla extends AbstractTableModel {
 
         String[] cols = {
                 "Nombre", "Tamaño", "Llegada",
-                "Espera", "Salida", "Estado"
+                "Salida", "Estado"
         };
 
         public int getRowCount() {
@@ -293,14 +301,12 @@ public class ProcessManagerSimple extends JFrame {
                 case 0 -> p.nombre;
                 case 1 -> p.tamaño;
                 case 2 -> p.llegada;
-                case 3 -> p.espera;
-                case 4 -> p.salida;
-                case 5 -> p.estado;
+                case 3 -> p.salida;
+                case 4 -> p.estado;
                 default -> "";
             };
         }
     }
-
     // ───────── COLORES TABLA ─────────
     void aplicarColoresTabla() {
 
@@ -314,9 +320,9 @@ public class ProcessManagerSimple extends JFrame {
                         super.getTableCellRendererComponent(
                                 t, v, sel, foc, row, col);
 
-                        // 👇 Ahora Estado está en la columna 5
+                        // 👇 Estado ahora está en columna 4
                         String estado =
-                                (String) t.getValueAt(row, 5);
+                                (String) t.getValueAt(row, 4);
 
                         if ("En memoria".equals(estado))
                             setBackground(new Color(180, 255, 180));
